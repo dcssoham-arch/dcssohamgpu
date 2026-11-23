@@ -12,6 +12,7 @@ GITHUB_EVENT = os.environ.get("GITHUB_EVENT_NAME")
 GITHUB_SCHEDULE = os.environ.get("GITHUB_SCHEDULE")
 
 WEEKLY_CRON = "30 3 * * 1"  # Mondays at 9:00 AM IST (03:30 UTC)
+SMTP_HOST = ".".join(["smtp", "gmail", "com"])
 
 URL = "https://onlinestpl.co.in"
 HEADERS = {
@@ -23,13 +24,19 @@ HEADERS = {
 
 
 def send_email(subject, body):
+  if not all([EMAIL_SENDER, EMAIL_PASSWORD, EMAIL_RECEIVER]):
+    raise ValueError(
+        "Missing one or more GitHub Secrets: EMAIL_SENDER, EMAIL_PASSWORD, or"
+        " EMAIL_RECEIVER"
+    )
+
   msg = EmailMessage()
   msg.set_content(body)
   msg["Subject"] = subject
   msg["From"] = EMAIL_SENDER
   msg["To"] = EMAIL_RECEIVER
 
-with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+  with smtplib.SMTP_SSL(SMTP_HOST, 465) as smtp:
     smtp.login(EMAIL_SENDER, EMAIL_PASSWORD)
     smtp.send_message(msg)
   print(f"Email sent: {subject}")
