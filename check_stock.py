@@ -29,7 +29,7 @@ def send_email(subject, body):
   msg["From"] = EMAIL_SENDER
   msg["To"] = EMAIL_RECEIVER
 
-  with smtplib.SMTP_SSL("://gmail.com", 465) as smtp:
+with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
     smtp.login(EMAIL_SENDER, EMAIL_PASSWORD)
     smtp.send_message(msg)
   print(f"Email sent: {subject}")
