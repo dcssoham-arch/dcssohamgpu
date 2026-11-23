@@ -14,7 +14,7 @@ GITHUB_SCHEDULE = os.environ.get("GITHUB_SCHEDULE")
 WEEKLY_CRON = "30 3 * * 1"  # Mondays at 9:00 AM IST (03:30 UTC)
 SMTP_HOST = ".".join(["smtp", "gmail", "com"])
 
-URL = "https://onlinestpl.co.in"
+URL = "https://" + "nvidia.onlinestpl.co.in/product/nvidia-geforce-rtx-5070"
 HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -48,11 +48,13 @@ def check_stock():
     response.raise_for_status()
     soup = BeautifulSoup(response.text, "html.parser")
 
-    page_text = soup.get_text().lower()
-    add_to_cart_btn = soup.find("button", {"name": "add-to-cart"})
+    # Focus only on the main RTX 5070 product box (ignores Related Products)
+    product_box = soup.find("div", class_="summary") or soup
+    box_text = product_box.get_text().lower()
+    add_to_cart_btn = product_box.find("button", {"name": "add-to-cart"})
 
     is_in_stock = bool(add_to_cart_btn) or (
-        "add to cart" in page_text and "out of stock" not in page_text
+        "add to cart" in box_text and "out of stock" not in box_text
     )
 
     if is_in_stock:
