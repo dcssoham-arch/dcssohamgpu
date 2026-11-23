@@ -1,0 +1,33 @@
+name: STPL RTX 5070 Stock Monitor
+
+on:
+  schedule:
+    # Runs automatically every 5 minutes
+    - cron: '*/5 * * * *'
+    # Runs once a week on Monday at 9:00 AM IST (03:30 UTC) for the weekly report
+    - cron: '30 3 * * 1'
+  workflow_dispatch: # Triggers the one-time startup confirmation when run manually
+
+jobs:
+  check-stock:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+
+      - name: Run stock checker
+        env:
+          EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_RECEIVER: ${{ secrets.EMAIL_RECEIVER }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_SCHEDULE: ${{ github.event.schedule }}
+        run: python check_stock.py
